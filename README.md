@@ -48,6 +48,10 @@ Clinics and healthcare providers often struggle with patients missing their foll
 
 ---
 
+## Pitch Deck 
+Using canva i managed to create a short pitch
+Click this link to access the pitch  : https://www.canva.com/design/DAGodhe_CkU/OQtM04qUSVOkHYEL9Kux9Q/edit?utm_content=DAGodhe_CkU&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton
+
 ## 🛠️ Tech Stack
 
 | Category     | Tech Used                       |
@@ -70,17 +74,16 @@ Clinics and healthcare providers often struggle with patients missing their foll
 
 ### Steps
 
-bash
-# Step 1: Clone the repository
+> Step 1: Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Move into the project folder
+> Step 2: Move into the project folder
 cd mindful-clinic-ai
 
-# Step 3: Install all dependencies
+> Step 3: Install all dependencies
 npm install
 
-# Step 4: Start the development server
+> Step 4: Start the development server
 npm run dev
 
 
