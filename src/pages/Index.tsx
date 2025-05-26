@@ -1,37 +1,37 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { AuthForm } from '@/components/AuthForm';
-import { Header } from '@/components/Header';
-import { Dashboard } from '@/components/Dashboard';
+import { AuthenticatedApp } from '@/components/AuthenticatedApp';
+import { AuthProvider, useAuth } from '@/hooks/useAuth';
 
-const Index = () => {
-  const [user, setUser] = useState<{ email: string; role: string; name: string } | null>(null);
+function AppContent() {
+  const { user, loading } = useAuth();
 
-  const handleAuthSuccess = (userData: { email: string; role: string; name: string }) => {
-    setUser(userData);
-    console.log('User authenticated:', userData);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    console.log('User logged out');
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-medical-blue/5 to-medical-teal/5">
+        <div className="flex items-center space-x-2">
+          <div className="w-8 h-8 border-4 border-medical-blue/30 border-t-medical-blue rounded-full animate-spin" />
+          <span className="text-medical-blue font-medium">Loading CareConnect...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
+    <div className="min-h-screen bg-background">
+      {!user ? <AuthForm /> : <AuthenticatedApp />}
+    </div>
+  );
+}
+
+const Index = () => {
+  return (
     <ThemeProvider defaultTheme="light" storageKey="careconnect-theme">
-      <div className="min-h-screen bg-background">
-        {!user ? (
-          <AuthForm onAuthSuccess={handleAuthSuccess} />
-        ) : (
-          <>
-            <Header />
-            <main className="container mx-auto px-4 py-6">
-              <Dashboard user={user} />
-            </main>
-          </>
-        )}
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   );
 };

@@ -6,41 +6,61 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Heart, Shield, Users } from 'lucide-react';
+import { Heart, Shield, Users, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
-interface AuthFormProps {
-  onAuthSuccess: (user: { email: string; role: string; name: string }) => void;
-}
-
-export function AuthForm({ onAuthSuccess }: AuthFormProps) {
+export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const { signIn, signUp } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>, mode: 'login' | 'signup') => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    const name = formData.get('name') as string;
+    const fullName = formData.get('name') as string;
     const role = formData.get('role') as string;
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      let result;
+      if (mode === 'login') {
+        result = await signIn(email, password);
+      } else {
+        result = await signUp(email, password, fullName, role);
+      }
+
+      if (result.error) {
+        setError(result.error.message);
+        toast({
+          title: 'Authentication Error',
+          description: result.error.message,
+          variant: 'destructive',
+        });
+      } else {
+        toast({
+          title: mode === 'login' ? 'Welcome back!' : 'Account created!',
+          description: mode === 'login' 
+            ? 'Successfully logged in to CareConnect' 
+            : 'Your account has been created. Please check your email to verify your account.',
+        });
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unexpected error occurred';
+      setError(errorMessage);
       toast({
-        title: mode === 'login' ? 'Welcome back!' : 'Account created!',
-        description: `Successfully ${mode === 'login' ? 'logged in' : 'signed up'} as ${role || 'user'}`,
+        title: 'Error',
+        description: errorMessage,
+        variant: 'destructive',
       });
-      
-      onAuthSuccess({
-        email,
-        role: role || 'patient',
-        name: name || email.split('@')[0]
-      });
-    }, 1500);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -68,6 +88,13 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {error && (
+              <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 rounded-md flex items-center space-x-2 text-destructive">
+                <AlertCircle className="w-4 h-4" />
+                <span className="text-sm">{error}</span>
+              </div>
+            )}
+            
             <Tabs defaultValue="login" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Sign In</TabsTrigger>
@@ -143,7 +170,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="role">Role</Label>
-                    <Select name="role" defaultValue="provider">
+                    <Select name="role" defaultValue="patient">
                       <SelectTrigger className="transition-all duration-200 focus:ring-2 focus:ring-medical-blue/20">
                         <SelectValue placeholder="Select your role" />
                       </SelectTrigger>
@@ -151,6 +178,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
                         <SelectItem value="provider">Healthcare Provider</SelectItem>
                         <SelectItem value="patient">Patient</SelectItem>
                         <SelectItem value="admin">Administrator</SelectItem>
+                        <SelectItem value="doctor">Doctor</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -161,6 +189,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
                       name="password"
                       type="password"
                       required
+                      minLength={6}
                       className="transition-all duration-200 focus:ring-2 focus:ring-medical-blue/20"
                     />
                   </div>

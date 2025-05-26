@@ -1,10 +1,31 @@
 
 import React from 'react';
-import { Bell, User, Settings } from 'lucide-react';
+import { Bell, User, Settings, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 export function Header() {
+  const { signOut, user } = useAuth();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: 'Logged out successfully',
+        description: 'You have been securely logged out of CareConnect',
+      });
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to log out. Please try again.',
+        variant: 'destructive',
+      });
+    }
+  };
+
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
@@ -29,6 +50,17 @@ export function Header() {
           </Button>
           <Button variant="ghost" size="sm" className="hover:bg-medical-blue/10">
             <User className="h-4 w-4" />
+            <span className="ml-1 text-xs hidden sm:inline">
+              {user?.email?.split('@')[0]}
+            </span>
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="hover:bg-destructive/10 text-destructive hover:text-destructive"
+            onClick={handleLogout}
+          >
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>
