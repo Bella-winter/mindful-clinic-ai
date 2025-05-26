@@ -67,9 +67,10 @@ Clinics and healthcare providers often struggle with patients missing their foll
 - Node.js & npm (install with [nvm](https://github.com/nvm-sh/nvm))
 - Git
 
+
 ### Steps
 
-```bash
+bash
 # Step 1: Clone the repository
 git clone <YOUR_GIT_URL>
 
@@ -81,8 +82,6 @@ npm install
 
 # Step 4: Start the development server
 npm run dev
-
-----
 
 
 ## 💡 Sample AI Reminder Prompts
