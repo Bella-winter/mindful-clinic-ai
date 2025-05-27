@@ -21,18 +21,24 @@ export function ResponsiveGrid({
   cols = { default: 1, sm: 2, lg: 3 },
   gap = 4
 }: ResponsiveGridProps) {
-  const gridClasses = [
-    `grid`,
-    `gap-${gap}`,
-    cols.default && `grid-cols-${cols.default}`,
-    cols.sm && `sm:grid-cols-${cols.sm}`,
-    cols.md && `md:grid-cols-${cols.md}`,
-    cols.lg && `lg:grid-cols-${cols.lg}`,
-    cols.xl && `xl:grid-cols-${cols.xl}`,
-  ].filter(Boolean).join(' ');
+  const getGridClasses = () => {
+    const classes = ['grid'];
+    
+    // Add gap
+    classes.push(`gap-${gap}`);
+    
+    // Add responsive grid columns
+    if (cols.default) classes.push(`grid-cols-${cols.default}`);
+    if (cols.sm) classes.push(`sm:grid-cols-${cols.sm}`);
+    if (cols.md) classes.push(`md:grid-cols-${cols.md}`);
+    if (cols.lg) classes.push(`lg:grid-cols-${cols.lg}`);
+    if (cols.xl) classes.push(`xl:grid-cols-${cols.xl}`);
+    
+    return classes.join(' ');
+  };
 
   return (
-    <div className={cn(gridClasses, className)}>
+    <div className={cn(getGridClasses(), className)}>
       {children}
     </div>
   );

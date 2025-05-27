@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Bell, User, Settings, LogOut, Menu, X } from 'lucide-react';
+import { Bell, User, Settings, LogOut, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from './ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
@@ -21,12 +21,20 @@ export function Header() {
         description: 'You have been securely logged out of CareConnect',
       });
     } catch (error) {
+      console.error('Logout error:', error);
       toast({
         title: 'Error',
         description: 'Failed to log out. Please try again.',
         variant: 'destructive',
       });
     }
+  };
+
+  const getUserDisplayName = () => {
+    if (!user) return 'User';
+    return user.user_metadata?.full_name || 
+           user.email?.split('@')[0] || 
+           'User';
   };
 
   const HeaderActions = ({ isMobile = false }) => (
@@ -66,7 +74,7 @@ export function Header() {
         >
           <User className="h-4 w-4 mr-1" />
           <span className="text-xs sm:text-sm">
-            {user?.email?.split('@')[0]}
+            {getUserDisplayName()}
           </span>
         </Button>
         <Button 

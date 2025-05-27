@@ -22,11 +22,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         console.log('Auth state changed:', event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+
+        // If user just signed up, ensure profile exists
+        if (event === 'SIGNED_UP' && session?.user) {
+          setTimeout(() => {
+            // Check if profile exists, create if not
+            supabase
+              .from('profiles')
+              .select('id')
+              .eq('id', session.user.id)
+              .single()
+              .then(({ data, error }) => {
+                if (error && error.code === 'PGRST116') {
+                  // Profile doesn't exist, create it
+                  supabase
+                    .from('profiles')
+                    .insert({
+                      id: session.user.id,
+                      email: session.user.email,
+                      full_name: session.user.user_metadata?.full_name || session.user.email,
+                      role: session.user.user_metadata?.role || 'patient'
+                    })
+                    .then(({ error: insertError }) => {
+                      if (insertError) {
+                        console.error('Error creating profile:', insertError);
+                      }
+                    });
+                }
+              });
+          }, 0);
+        }
       }
     );
 
