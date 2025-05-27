@@ -19,11 +19,13 @@ export function AuthenticatedApp() {
   };
 
   return (
-    <>
+    <div className="min-h-screen w-full flex flex-col">
       <Header />
-      <main className="container mx-auto px-4 py-6">
-        <Dashboard user={userData} />
+      <main className="flex-1 w-full">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 max-w-7xl">
+          <Dashboard user={userData} />
+        </div>
       </main>
-    </>
+    </div>
   );
 }
